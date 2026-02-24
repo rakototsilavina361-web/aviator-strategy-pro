@@ -3,87 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Stratégie Pro</title>
+    <title>Aviator Predictor V2</title>
     <style>
-        :root { --danger: #e11d48; --success: #10b981; --bg: #0f172a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; }
-        .container { max-width: 500px; margin: auto; }
-        .card { background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
-        h2 { font-size: 16px; color: var(--success); margin-top: 0; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--danger); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
-        .result { margin-top: 15px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 4px solid var(--success); display: none; }
-        .warning { color: #94a3b8; font-size: 12px; margin-top: 10px; }
+        :root { --danger: #e11d48; --violet: #8b5cf6; --rose: #f472b6; --blue: #3b82f6; --bg: #0f172a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 10px; }
+        .card { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .btn-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .color-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .blue { background: var(--blue); color: white; }
+        .violet { background: var(--violet); color: white; }
+        .rose { background: var(--rose); color: white; }
+        .history { display: flex; gap: 5px; justify-content: center; margin-bottom: 15px; height: 30px; }
+        .dot { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #fff; }
+        .alert { padding: 15px; border-radius: 8px; background: rgba(225, 29, 72, 0.2); border: 1px solid var(--danger); display: none; text-align: center; }
+        .no-go { color: #f87171; font-weight: bold; margin-bottom: 10px; text-align: center; display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1 style="text-align: center; color: var(--danger);">✈️ AVIATOR PREDICTOR</h1>
+<div class="container" style="max-width: 450px; margin: auto;">
+    <h1 style="text-align: center; font-size: 20px; color: var(--danger);">✈️ PREDICTOR V2 (MOTIFS)</h1>
+
+    <div id="dangerZone" class="no-go">⚠️ TOURS TSARA TSY IDIRANA (14h45 - 16h45)</div>
 
     <div class="card">
-        <h2>📊 Stratégie Tours (Bleu x4)</h2>
-        <p class="warning">Isao ny Bleu (1.50 - 1.99) ao anaty 4-8 bleu successifs.</p>
-        <input type="number" id="nbBleu" placeholder="Isan'ny bleu (1.50+)">
-        <button onclick="calcTours()">Calculer le Tour</button>
-        <div id="resTours" class="result"></div>
+        <h2 style="font-size: 14px;">Mampiditra ny loko 5 farany:</h2>
+        <div class="history" id="historyView"></div>
+        <div class="btn-group">
+            <button class="color-btn blue" onclick="add('B')">BLEU</button>
+            <button class="color-btn violet" onclick="add('V')">VIOLET</button>
+            <button class="color-btn rose" onclick="add('R')">ROSE</button>
+        </div>
+        <button onclick="reset()" style="width: 100%; background: none; border: 1px solid #444; color: #888; padding: 5px;">Reset History</button>
     </div>
 
-    <div class="card">
-        <h2>📉 Analyse Décroissante</h2>
-        <p class="warning">Mampidira cote roa (ex: 3.50 sy 1.86)</p>
-        <input type="number" step="0.01" id="cote1" placeholder="Cote 1">
-        <input type="number" step="0.01" id="cote2" placeholder="Cote 2">
-        <button onclick="calcDecroiss()">Vérifier Condition</button>
-        <div id="resDecroiss" class="result"></div>
-    </div>
-
-    <div class="card">
-        <h2>🕒 Prédiction par Lera</h2>
-        <input type="text" id="time1" placeholder="Lera 1 (ex: 11:20:30)">
-        <input type="text" id="time2" placeholder="Lera 2 (ex: 11:30:30)">
-        <button onclick="calcTime()">Calculer Prochain Boom</button>
-        <div id="resTime" class="result"></div>
-    </div>
+    <div id="prediction" class="alert"></div>
 </div>
 
 <script>
-    // 1. Logic Bleu x4
-    function calcTours() {
-        const nb = document.getElementById('nbBleu').value;
-        if(nb) {
-            const result = nb * 4;
-            const resDiv = document.getElementById('resTours');
-            resDiv.style.display = "block";
-            resDiv.innerHTML = `<strong>Valiny: ${result}</strong><br>Manisà tours ${result} manomboka eo amin'ny violet farany. Miomana miditra eo amin'ny faha-${result - 1}! 🚀`;
+    let history = [];
+    const dangerZone = document.getElementById('dangerZone');
+
+    // Jereo ny lera (14h45 - 16h45)
+    function checkTime() {
+        const now = new Date();
+        const hour = now.getHours();
+        const min = now.getMinutes();
+        if ((hour === 14 && min >= 45) || hour === 15 || (hour === 16 && min <= 45)) {
+            dangerZone.style.display = "block";
+        }
+    }
+    setInterval(checkTime, 1000);
+
+    function add(color) {
+        if (history.length >= 5) history.shift();
+        history.push(color);
+        updateView();
+        analyze();
+    }
+
+    function updateView() {
+        const view = document.getElementById('historyView');
+        view.innerHTML = history.map(c => `<div class="dot" style="background: ${c === 'B' ? 'var(--blue)' : c === 'V' ? 'var(--violet)' : 'var(--rose)'}"></div>`).join('');
+    }
+
+    function analyze() {
+        const pattern = history.join('');
+        const res = document.getElementById('prediction');
+        res.style.display = "block";
+        res.innerHTML = "Mikaroka motif... 🔍";
+
+        // STRATEGIE 1: 💙💜🌹💙💜
+        if (pattern === "BVRBV") {
+            res.innerHTML = "✅ <strong>BOOM PROCHE!</strong><br>+3min (x30/x10)<br>+5min (x70)<br>+8min (x15)";
+        } 
+        // STRATEGIE 2: 💜💙🌹💙💜
+        else if (pattern === "VBVBV") {
+            res.innerHTML = "✅ <strong>OPPORTUNITÉ!</strong><br>+3min (x25)<br>+12min (x20)";
+        }
+        // STRATEGIE 3: 💜💜🌹💜💜
+        else if (pattern === "VVRVV") {
+            res.innerHTML = "✅ <strong>SUR!</strong><br>+6min (x20/x30) na (x600)";
+        }
+        // STRATEGIE 4: 💙💙🌹💙💙
+        else if (pattern === "BBRBB") {
+            res.innerHTML = "✅ <strong>ATTENTION ROSE!</strong><br>+3min (x30/x400)<br>+9min (x50 auto)";
+        }
+        else {
+            res.innerHTML = "Miandry motif feno (5 loko)... ⏳";
         }
     }
 
-    // 2. Logic Décroissance
-    function calcDecroiss() {
-        const c1 = document.getElementById('cote1').value;
-        const c2 = document.getElementById('cote2').value;
-        if(c1 && c2) {
-            const v1 = (c1 % 1).toFixed(2) * 100;
-            const v2 = (c2 % 1).toFixed(2) * 100;
-            const resDiv = document.getElementById('resDecroiss');
-            resDiv.style.display = "block";
-            
-            if(v1 > 50 && v2 > 50 && c1 > c2) {
-                resDiv.innerHTML = "✅ <strong>Fepetra feno!</strong> Ny tour manaraka dia tokony ho VIOLET (x2+) 🚀";
-            } else {
-                resDiv.innerHTML = "❌ Tsy feno ny fepetra (Décroissant + Virgule > 50).";
-            }
-        }
-    }
-
-    // 3. Logic Time (Simplifié)
-    function calcTime() {
-        // Eto no asiana an'ilay soustraction lera sy addition minutes
-        // Ohatra tsotra:
-        const resDiv = document.getElementById('resTime');
-        resDiv.style.display = "block";
-        resDiv.innerHTML = "Analyse en cours... Miandrasa cote 1.00-1.10 aloha. ⏳";
+    function reset() {
+        history = [];
+        updateView();
+        document.getElementById('prediction').style.display = "none";
     }
 </script>
 </body>
