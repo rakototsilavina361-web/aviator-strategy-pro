@@ -3,57 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Predictor V2</title>
+    <title>Aviator Predictor V2 - Strategy</title>
     <style>
         :root { --danger: #e11d48; --violet: #8b5cf6; --rose: #f472b6; --blue: #3b82f6; --bg: #0f172a; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 10px; }
+        .container { max-width: 450px; margin: auto; }
         .card { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
         .btn-group { display: flex; gap: 5px; margin-bottom: 15px; }
-        .color-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .color-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .color-btn:active { transform: scale(0.95); }
         .blue { background: var(--blue); color: white; }
         .violet { background: var(--violet); color: white; }
         .rose { background: var(--rose); color: white; }
-        .history { display: flex; gap: 5px; justify-content: center; margin-bottom: 15px; height: 30px; }
+        .history { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; height: 30px; }
         .dot { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #fff; }
-        .alert { padding: 15px; border-radius: 8px; background: rgba(225, 29, 72, 0.2); border: 1px solid var(--danger); display: none; text-align: center; }
-        .no-go { color: #f87171; font-weight: bold; margin-bottom: 10px; text-align: center; display: none; }
+        .alert { padding: 15px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; display: none; text-align: center; line-height: 1.6; }
+        .no-go { background: rgba(225, 29, 72, 0.2); color: #f87171; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; text-align: center; display: none; border: 1px solid var(--danger); }
+        .schedule { font-size: 11px; color: var(--rose); text-align: center; border-top: 1px solid #334155; pt-10; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 450px; margin: auto;">
-    <h1 style="text-align: center; font-size: 20px; color: var(--danger);">✈️ PREDICTOR V2 (MOTIFS)</h1>
+<div class="container">
+    <h1 style="text-align: center; font-size: 18px; color: var(--danger); margin-bottom: 5px;">🚀 PREDICTOR V2 (MOTIFS)</h1>
+    <p style="text-align: center; font-size: 10px; color: #94a3b8; margin-bottom: 15px;">Calcul Automatique de Stratégie</p>
 
-    <div id="dangerZone" class="no-go">⚠️ TOURS TSARA TSY IDIRANA (14h45 - 16h45)</div>
+    <div id="dangerZone" class="no-go">⚠️ TOURS TSARA TSY IDIRANA (14:45 - 16:45)</div>
 
     <div class="card">
-        <h2 style="font-size: 14px;">Mampiditra ny loko 5 farany:</h2>
+        <h2 style="font-size: 13px; margin-bottom: 10px; text-align: center;">Mampiditra ny loko 5 farany hita:</h2>
         <div class="history" id="historyView"></div>
         <div class="btn-group">
-            <button class="color-btn blue" onclick="add('B')">BLEU</button>
-            <button class="color-btn violet" onclick="add('V')">VIOLET</button>
-            <button class="color-btn rose" onclick="add('R')">ROSE</button>
+            <button class="color-btn blue" onclick="add('B')">B</button>
+            <button class="color-btn violet" onclick="add('V')">V</button>
+            <button class="color-btn rose" onclick="add('R')">R</button>
         </div>
-        <button onclick="reset()" style="width: 100%; background: none; border: 1px solid #444; color: #888; padding: 5px;">Reset History</button>
+        <button onclick="reset()" style="width: 100%; background: none; border: 1px solid #444; color: #888; padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer;">Fafao ny tantara (Reset)</button>
     </div>
 
     <div id="prediction" class="alert"></div>
+
+    <div class="card" style="border-color: var(--rose);">
+        <h3 style="color: var(--rose); font-size: 12px; margin: 0 0 8px; text-align: center;">🕒 LERA TOKONY HISY ROSE:</h3>
+        <p style="font-size: 11px; text-align: center; margin: 0; color: #cbd5e1;">
+            57-59 ; 01-03 ; 20-22 ; 29-31 ; 40-42 ; 45-47 ; 50-52
+        </p>
+        <div class="schedule">
+            💡 1-3 Partie (1s à 30s) no tena tsara idirana.
+        </div>
+    </div>
 </div>
 
 <script>
     let history = [];
     const dangerZone = document.getElementById('dangerZone');
 
-    // Jereo ny lera (14h45 - 16h45)
+    // Fampitandremana lera tsy azo idirana
     function checkTime() {
         const now = new Date();
-        const hour = now.getHours();
-        const min = now.getMinutes();
-        if ((hour === 14 && min >= 45) || hour === 15 || (hour === 16 && min <= 45)) {
+        const h = now.getHours();
+        const m = now.getMinutes();
+        if ((h === 14 && m >= 45) || h === 15 || (h === 16 && m <= 45)) {
             dangerZone.style.display = "block";
+        } else {
+            dangerZone.style.display = "none";
         }
     }
     setInterval(checkTime, 1000);
+    checkTime();
 
     function add(color) {
         if (history.length >= 5) history.shift();
@@ -71,27 +88,46 @@
         const pattern = history.join('');
         const res = document.getElementById('prediction');
         res.style.display = "block";
-        res.innerHTML = "Mikaroka motif... 🔍";
 
-        // STRATEGIE 1: 💙💜🌹💙💜
-        if (pattern === "BVRBV") {
-            res.innerHTML = "✅ <strong>BOOM PROCHE!</strong><br>+3min (x30/x10)<br>+5min (x70)<br>+8min (x15)";
-        } 
-        // STRATEGIE 2: 💜💙🌹💙💜
-        else if (pattern === "VBVBV") {
-            res.innerHTML = "✅ <strong>OPPORTUNITÉ!</strong><br>+3min (x25)<br>+12min (x20)";
-        }
-        // STRATEGIE 3: 💜💜🌹💜💜
-        else if (pattern === "VVRVV") {
-            res.innerHTML = "✅ <strong>SUR!</strong><br>+6min (x20/x30) na (x600)";
-        }
-        // STRATEGIE 4: 💙💙🌹💙💙
-        else if (pattern === "BBRBB") {
-            res.innerHTML = "✅ <strong>ATTENTION ROSE!</strong><br>+3min (x30/x400)<br>+9min (x50 auto)";
-        }
-        else {
+        if (history.length < 5) {
             res.innerHTML = "Miandry motif feno (5 loko)... ⏳";
+            res.style.borderColor = "#10b981";
+            return;
         }
+
+        let msg = "";
+        let found = true;
+
+        // Lisitry ny stratejia nalefanao
+        switch(pattern) {
+            case "BVRBV": 
+                msg = "🔥 <b>SUR X40!</b><br>+5min na +7min. <br>Target: Violet/Rose"; break;
+            case "VBRBV":
+                msg = "💎 <b>STRAT X25/X10!</b><br>+3min (x25) | +8min (x10) | +12min (x20)"; break;
+            case "VVRVV":
+                msg = "🌹 <b>ROSE SUR (X600)!</b><br>+6min ny elanelany miala eo."; break;
+            case "BBRBB":
+                msg = "💰 <b>JACKPOT (X400)!</b><br>+3min (x30) | +5min (x100) | +9min (x50 auto)"; break;
+            case "VBRVV":
+                msg = "⚡ <b>PROCHAIN BOOM!</b><br>+3min (x10) | +7min (x20)"; break;
+            case "BBRVV":
+                msg = "🎯 <b>TARGET X15/X30!</b><br>+9min (x10) | +4min (x15)"; break;
+            case "VVRVB":
+                msg = "📊 <b>VALINY X50:</b><br>+5min (x50) | +9min (x10 auto) | +19min (x300)"; break;
+            case "BVRVV":
+                msg = "🚀 <b>BOOM X150!</b><br>+3min (x50) | +7min (x150) | +10min (x15)"; break;
+            case "BRRRV":
+                msg = "🔥 <b>ROSE ALERT!</b><br>+4min miala eo (x150)"; break;
+            case "VRRRV":
+                msg = "🌹 <b>SUPER ROSE!</b><br>+8min (x30/x100) | +6min (x10)"; break;
+            default:
+                found = false;
+                msg = "⚠️ Motif tsy hita. <br>Andramo ny +3min na +5min (x2/x5).";
+        }
+
+        res.innerHTML = msg;
+        res.style.borderColor = found ? "var(--rose)" : "#334155";
+        res.style.background = found ? "rgba(244, 114, 182, 0.1)" : "rgba(16, 185, 129, 0.1)";
     }
 
     function reset() {
